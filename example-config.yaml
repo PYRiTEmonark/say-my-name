@@ -1,0 +1,21 @@
+# Slack bot token - Keep it secret!
+token: xoxb-*
+# python Shelve db name
+db_name: say-my-name
+# Command for the leaderboard
+command: "!say-my-name"
+# Time before you can be gotten again
+timeout: 30
+
+# Enable OCR
+use_ocr: False
+# Font file to use for OCR
+font_file: "OCR.TTF"
+
+# Keyword name followed by all possible keywords
+# Note that the keyword name is not matched
+keywords:
+  three:
+    - 3
+    - three
+    - 1+2
