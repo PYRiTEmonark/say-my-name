@@ -12,6 +12,8 @@ use_ocr: False
 # Font file to use for OCR
 font_file: "OCR.TTF"
 
+# If true, keywords are case sensitive
+case_sensitive: false
 # Keyword name followed by all possible keywords
 # Note that the keyword name is not matched
 keywords:

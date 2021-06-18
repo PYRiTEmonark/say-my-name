@@ -13,45 +13,40 @@ CONFIG = yaml.load(open('config.yaml'), Loader=yaml.Loader)
 slack_token = CONFIG['token']
 command = CONFIG['command'].strip(' "')
 db_name = CONFIG['db_name']
+case_sensitive = str(CONFIG.get('case_sensitive')).lower() == 'true'
 timeout = int(CONFIG['timeout'])
 
-use_ocr = bool(CONFIG['use_ocr'])
+use_ocr = str(CONFIG.get('use_ocr')).lower() == 'true'
 
 if use_ocr:
     print('WARNING: you have enabled OCR. This is likely to be slow.')
     import ocr
 
-    font_file = CONFIG['font_file']
-    font_size = CONFIG.get('font_size', 25)
-    font_gap = CONFIG.get('font_gap', 5)
-
-    ocr_cleaner = ocr.OCRcleaner(font_file, font_size, font_gap)
+    ocr_cleaner = ocr.OCRcleaner(CONFIG['font_file'], CONFIG.get('font_size', 25), CONFIG.get('font_gap', 5))
 
 def clean_dict(dct):
     out = {}
     for k, v in dct.items():
-        if isinstance(v, str):
-            out[k] = v
-        elif isinstance(v, dict):
+        if isinstance(v, dict):
             out[k] = clean_dict(v)
         elif isinstance(v, list):
             out[k] = clean_list(v)
         else:
-            out[k] = str(v)
+            if case_sensitive: out[k] = str(v)
+            else: out[k] = str(v).lower()
     
     return out
 
 def clean_list(lst):
     out = []
     for x in lst:
-        if isinstance(x, str):
-            out.append(x)
-        elif isinstance(x, dict):
+        if isinstance(x, dict):
             out.append(clean_dict(x))
         elif isinstance(x, list):
             out.append(clean_list(x))
         else:
-            out.append(str(x))
+            if case_sensitive: out.append(str(x))
+            else: out.append(str(x).lower())
     
     return out
 
@@ -88,10 +83,13 @@ def handle_message(**payload):
     if use_ocr:
         message = ocr_cleaner(message)
 
+    if not case_sensitive:
+        message = message.lower()
+
     for kwname, kwrds in keywords.items():
         if message in kwrds:
             handle_keyword(kwname, user, channel_id, client)
-            return  
+            return
 
 def handle_command(channel_id, client):
     # cmd = message.replace(command, '').strip()
