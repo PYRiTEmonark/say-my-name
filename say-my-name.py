@@ -97,7 +97,6 @@ def handle_message(**payload):
         for kwrd in kwrds:
             if isinstance(kwrd, dict):
                 cmd, kwrd = list(kwrd.items())[0]
-                print(cmd, kwrd)
                 if cmd == 'eval' and str(aeval(message)) == kwrd:
                     handle_keyword(kwname, user, channel_id, client)
             else:
