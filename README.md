@@ -19,6 +19,15 @@ keywords:
 
 If you are using OCR (don't) you will need a ttf file with a suitable font.
 
+## Eval
+If you want the bot to evaluate the keyword simply write the keyword as follows
+```
+keywords:
+  <keyword-name>:
+    - eval: <keywords>
+```
+Evaluation is done with http://newville.github.io/asteval/index.html
+
 ## shelve schema
 ```
 {

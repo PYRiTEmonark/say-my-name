@@ -4,8 +4,13 @@ import string
 from operator import itemgetter
 
 import yaml
+
 from slack_sdk import WebClient
 from slack_sdk.rtm import RTMClient
+
+from asteval import Interpreter
+
+aeval = Interpreter()
 
 # Todo: Config checking
 CONFIG = yaml.load(open('config.yaml'), Loader=yaml.Loader)
@@ -70,6 +75,8 @@ def handle_message(**payload):
     except KeyError as e: print('KeyError:', e)
     except Exception as e: print('Exception:', e)
 
+    print(aeval(message))
+
     client = payload['web_client']
 
     channel_id = data['channel']
@@ -87,9 +94,16 @@ def handle_message(**payload):
         message = message.lower()
 
     for kwname, kwrds in keywords.items():
-        if message in kwrds:
-            handle_keyword(kwname, user, channel_id, client)
-            return
+        for kwrd in kwrds:
+            if isinstance(kwrd, dict):
+                cmd, kwrd = list(kwrd.items())[0]
+                print(cmd, kwrd)
+                if cmd == 'eval' and str(aeval(message)) == kwrd:
+                    handle_keyword(kwname, user, channel_id, client)
+            else:
+                if message == kwrd:
+                    handle_keyword(kwname, user, channel_id, client)
+                    return
 
 def handle_command(channel_id, client):
     # cmd = message.replace(command, '').strip()
