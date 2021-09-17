@@ -75,8 +75,6 @@ def handle_message(**payload):
     except KeyError as e: print('KeyError:', e)
     except Exception as e: print('Exception:', e)
 
-    print(aeval(message))
-
     client = payload['web_client']
 
     channel_id = data['channel']
@@ -115,10 +113,7 @@ def handle_command(channel_id, client):
 
         board = list(reversed(sorted(board, key=itemgetter(1, 2))))
 
-        message = 'Leaderboard of shame:'
-        for i in range(min(len(board), 5)):
-            b = board[i]
-            message = message + f' {b[0]}: {b[1]},'
+        message = 'Leaderboard of shame: ' + ', '.join(f'{b[0]}: {b[1]}' for b in board[:5])
 
     client.chat_postMessage(
         channel = channel_id,
@@ -158,8 +153,8 @@ def handle_keyword(kwname, user, channel_id, client):
 
 def parse_blocks(blocks):
     '''
-    Parses Slack text blocks in a rather dumb way to just extract raw text
-    Dumb in the sense that it iterates through looking for text blocks
+    Parses Slack text blocks in a naive way to just extract raw text
+    Naive in the sense that it iterates through looking for blocks named text
     '''
     out = ''
     for block in blocks:
@@ -172,6 +167,10 @@ def parse_blocks(blocks):
     return out
 
 def get_username(user, client):
+    '''
+    get the username of the given user object
+    requires a slack client to be passed
+    '''
     user_info = client.users_info(user=user).get('user')['profile']
     disp = user_info['display_name_normalized']
     return disp if disp else user_info['real_name_normalized']
