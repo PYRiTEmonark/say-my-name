@@ -59,7 +59,6 @@ keywords = clean_dict(CONFIG['keywords'])
 
 print('Keywords:', keywords)
 
-# TODO: Use async
 @RTMClient.run_on(event="message")
 def handle_message(**payload):
     
