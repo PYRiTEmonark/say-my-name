@@ -19,8 +19,8 @@ keywords:
 
 If you are using OCR (don't) you will need a ttf file with a suitable font.
 
-## Eval
-If you want the bot to evaluate the keyword simply write the keyword as follows
+## Evaluated keywords
+If you want the bot to evaluate the input to match the keyword simply write the keyword as follows
 ```
 keywords:
   <keyword-name>:
@@ -28,12 +28,28 @@ keywords:
 ```
 Evaluation is done with http://newville.github.io/asteval/index.html
 
-## Case Sensitive
+## Case Sensitive keywords
 If you want a keyword to be case sensitive use the case_sensitive tag
 ```
 keywords:
   <keyword-name>:
     - case_sensitive: <keywords>
+```
+
+## Bot Command
+Set the bot command with the `command: !say-my-name` config option.
+
+To use the command, with `!say-my-name`
+
+```
+!say-my-name
+  equivalent to !say-my-name top 5
+
+!say-my-name top {n}
+  show the top n users
+
+!say-my-name user @user
+  show the record of the specified user
 ```
 
 ## shelve schema

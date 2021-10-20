@@ -2,6 +2,7 @@ import shelve
 import time
 import string
 from operator import itemgetter
+from shlex import split
 
 import yaml
 
@@ -70,6 +71,8 @@ def handle_message(**payload):
 
     user = data['user']
 
+    print(data['blocks'], end=' ')
+
     try:
         message = parse_blocks(data['blocks'])
     except KeyError as e: print('KeyError:', e)
@@ -80,8 +83,11 @@ def handle_message(**payload):
     channel_id = data['channel']
     # thread_ts = data['ts']
 
+    print(message)
+
     if message.startswith(command):
-        handle_command(channel_id, client)
+        handle_command(message, channel_id, client)
+        return
 
     # message = message.strip(string.punctuation + string.whitespace)
 
@@ -99,18 +105,30 @@ def handle_message(**payload):
                 if message.lower() == kwrd.lower():
                     handle_keyword(kwname, user, channel_id, client)
 
-def handle_command(channel_id, client):
+def handle_command(inp, channel_id, client):
     # cmd = message.replace(command, '').strip()
-    with shelve.open(db_name) as db:
-        board = []
-        for user, udata in db.items():
-            times = sum(udata['kwords'].values())
-            username = get_username(user, client)
-            board.append((username, times, udata['lasttime']))
+    cmd = split(inp)[1:]
 
-        board = list(reversed(sorted(board, key=itemgetter(1, 2))))
+    if cmd == []: cmd = 'top 5'
+    print('command:', cmd)
 
-        message = 'Leaderboard of shame: ' + ', '.join(f'{b[0]}: {b[1]}' for b in board[:5])
+    match cmd:
+        case 'top', amount:
+            with shelve.open(db_name) as db:
+                board = []
+                for user, udata in db.items():
+                    times = sum(udata['kwords'].values())
+                    username = get_username(user, client)
+                    board.append((username, times, udata['lasttime']))
+
+                board = list(reversed(sorted(board, key=itemgetter(1, 2))))
+
+                message = 'Leaderboard of shame: ' + ', '.join(f'{b[0]}: {b[1]}' for b in board[:amount])
+        
+        case 'user', name:
+            with shelve.open(db_name) as db:
+                times = sum(db[name]['kwords'].values())
+                message = f'{get_username(name, client)} has been gotten {times} times'
 
     client.chat_postMessage(
         channel = channel_id,
@@ -159,6 +177,8 @@ def parse_blocks(blocks):
             continue
         if block.get('type') == 'text':
             out += block.get('text')
+        if block.get('type') == 'user':
+            out += ' ' + block.get('user_id')
         elif 'elements' in block:
             out += parse_blocks(block['elements'])
     return out
