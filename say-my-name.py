@@ -39,7 +39,7 @@ def clean_dict(dct):
         else:
             if case_sensitive: out[k] = str(v)
             else: out[k] = str(v).lower()
-    
+
     return out
 
 def clean_list(lst):
@@ -52,7 +52,7 @@ def clean_list(lst):
         else:
             if case_sensitive: out.append(str(x))
             else: out.append(str(x).lower())
-    
+
     return out
 
 keywords = clean_dict(CONFIG['keywords'])
@@ -75,8 +75,6 @@ def handle_message(**payload):
     except KeyError as e: print('KeyError:', e)
     except Exception as e: print('Exception:', e)
 
-    print(aeval(message))
-
     client = payload['web_client']
 
     channel_id = data['channel']
@@ -96,13 +94,11 @@ def handle_message(**payload):
     for kwname, kwrds in keywords.items():
         for kwrd in kwrds:
             if isinstance(kwrd, dict):
-                cmd, kwrd = list(kwrd.items())[0]
-                if cmd == 'eval' and str(aeval(message)) == kwrd:
+                if 'eval' in kwrd and eval_math(message) == kwrd['eval']:
                     handle_keyword(kwname, user, channel_id, client)
             else:
                 if message == kwrd:
                     handle_keyword(kwname, user, channel_id, client)
-                    return
 
 def handle_command(channel_id, client):
     # cmd = message.replace(command, '').strip()
@@ -175,6 +171,16 @@ def get_username(user, client):
     user_info = client.users_info(user=user).get('user')['profile']
     disp = user_info['display_name_normalized']
     return disp if disp else user_info['real_name_normalized']
+
+def eval_math(expr:str) -> str:
+    x = aeval(expr)
+    try:
+        if x.is_integer():
+            return str(int(x))
+    except AttributeError:
+        pass
+
+    return str(x)
 
 # Ensure the shelve file exists
 with shelve.open(db_name, flag='c'): pass
