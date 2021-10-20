@@ -28,6 +28,14 @@ keywords:
 ```
 Evaluation is done with http://newville.github.io/asteval/index.html
 
+## Case Sensitive
+If you want a keyword to be case sensitive use the case_sensitive tag
+```
+keywords:
+  <keyword-name>:
+    - case_sensitive: <keywords>
+```
+
 ## shelve schema
 ```
 {

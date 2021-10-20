@@ -37,8 +37,8 @@ def clean_dict(dct):
         elif isinstance(v, list):
             out[k] = clean_list(v)
         else:
-            if case_sensitive: out[k] = str(v)
-            else: out[k] = str(v).lower()
+            # if case_sensitive: out[k] = str(v)
+            out[k] = str(v)
 
     return out
 
@@ -50,8 +50,8 @@ def clean_list(lst):
         elif isinstance(x, list):
             out.append(clean_list(x))
         else:
-            if case_sensitive: out.append(str(x))
-            else: out.append(str(x).lower())
+            # if case_sensitive: out.append(str(x))
+            out.append(str(x))
 
     return out
 
@@ -88,16 +88,15 @@ def handle_message(**payload):
     if use_ocr:
         message = ocr_cleaner(message)
 
-    if not case_sensitive:
-        message = message.lower()
-
     for kwname, kwrds in keywords.items():
         for kwrd in kwrds:
             if isinstance(kwrd, dict):
                 if 'eval' in kwrd and eval_math(message) == kwrd['eval']:
                     handle_keyword(kwname, user, channel_id, client)
+                if 'case_sensitive' in kwrd and message == kwrd['case_sensitive']:
+                    handle_keyword(kwname, user, channel_id, client)
             else:
-                if message == kwrd:
+                if message.lower() == kwrd.lower():
                     handle_keyword(kwname, user, channel_id, client)
 
 def handle_command(channel_id, client):
