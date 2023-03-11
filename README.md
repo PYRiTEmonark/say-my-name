@@ -6,7 +6,7 @@ For the rest, kind of a buzzkill.
 
 Also includes OCR functionality so that the message is interpreted as the user sees it.
 
-Based on https://github.com/danieljabailey/two-bot
+Based on https://github.com/lexbailey/two-bot
 
 ## Setup
 Copy the example-config.yaml to config.yaml and enter all fields.
@@ -17,7 +17,7 @@ keywords:
     - <keywords>
 ```
 
-If you are using OCR (don't) you will need a ttf file with a suitable font.
+If you are using OCR (don't) you will need a ttf file with a suitable font and an install of Google Tesseract OCR.
 
 ## Evaluated keywords
 If you want the bot to evaluate the input to match the keyword simply write the keyword as follows
